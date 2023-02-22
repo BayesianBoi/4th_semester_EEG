@@ -1,0 +1,63 @@
+---
+title: "methods-4-c-2"
+author: "Ditlev K"
+date: "2023-02-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+pacman::p_load(tidyverse, ggplot2)
+
+```
+
+## Rethinking
+
+```{r}
+install.packages(c("coda","mvtnorm","devtools","loo","dagitty","shape"))
+devtools::install_github("rmcelreath/rethinking")
+
+library(rethinking)
+```
+
+
+``````{r 3E1}
+p_grid <- seq( from=0 , to=1 , length.out=1000 )
+prior <- rep( 1 , 1000 )
+likelihood <- dbinom( 6 , size=9 , prob=p_grid )
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+set.seed(100)
+samples <- sample( p_grid , prob=posterior , size=1e4 , replace=TRUE )
+
+#3E1. How much posterior probability lies below p = 0.2?
+#3E2. How much posterior probability lies above p = 0.8?
+#3E3. How much posterior probability lies between p = 0.2 and p = 0.8?
+#3E4. 20% of the posterior probability lies below which value of p?
+#3E5. 20% of the posterior probability lies above which value of p?
+#3E6. Which values of p contain the narrowest interval equal to 66% of the posterior probability?
+#3E7. Which values of p contain 66% of the p 
+
+plot( p_grid , posterior , type="b" ,
+xlab="probability of water" , ylab="posterior probability" )
+mtext( "1000 points" )
+
+dens(samples)
+
+sum( samples < 0.2 ) /1e4
+
+sum( samples > 0.8 ) /1e4
+
+sum( samples > 0.2 & samples < 0.8 ) / 1e4
+
+quantile( samples , 0.2 )
+
+quantile( samples, 0.8 )
+
+HPDI( samples , prob=0.66 )
+```
+
+
+
+

@@ -4,6 +4,7 @@ from psychopy import gui
 import pandas as pd
 import glob
 import random
+from triggers import setParallelData
 
 #Defining GUI
 introgui=gui.Dlg(title = "Is this a face?")
@@ -18,6 +19,9 @@ if introgui.OK:
     [ID,Age,Gender]=introgui.data
 elif introgui.Cancel:
     core.quit()
+
+#Make triggers
+
 
 from psychopy import data
 #defining cols
@@ -48,10 +52,24 @@ event.waitKeys()
 for stimulus in stimuli:
     msg_2=visual.TextStim(win, text = "Left arrow = NO, Right arrow = YES")
     pic=visual.ImageStim(win,stimulus)
+    
+    #define triggers
+    if 'object' in stimulus:
+        trigger = 11
+    elif 'Face'in stimulus:
+        trigger = 21
+    elif 'pareidolia' in stimulus:
+        trigger = 31
+    
     # Draw the Stimuli
     pic.draw()
     msg_2.draw()
+    win.callOnFlip(setParallelData, trigger)  
+    pullTriggerDown = True
     win.flip()
+    if pullTriggerDown: 
+        win.callOnFlip(setParallelData, 0)
+        pullTriggerDown = False
     #define clock watch
     stopwatch=core.Clock()
     # Reset and Start the Clock
@@ -61,7 +79,7 @@ for stimulus in stimuli:
     #RT
     reaction_time = stopwatch.getTime()
     
-    resp_key=event.getKeys(keyList = ("left","right"), timeStamped=False)
+    #resp_key=event.getKeys(keyList = ("left","right"), timeStamped=False) not necessary
     print(key)
     #if resp_key==["left"] or ["right"]:
      #   event.getKeys()
@@ -84,6 +102,7 @@ for stimulus in stimuli:
         "Age": Age,
         "Gender": Gender,
         "Stimulus": stimulus,
+        "Trigger": trigger,
         "ReactionTime" : reaction_time,
         "Key" : key
         },ignore_index=True)
